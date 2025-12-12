@@ -10,9 +10,9 @@
     <style>
         :root {
             --primary: #0f172a; /* Slate 900 */
-            --accent: #1e3a8a; /* Royal Navy */
-            --highlight: #0e7490; /* Teal 700 */
-            --light-bg: #f0f9ff; /* Sky 50 */
+            --accent: #312e81; /* Indigo 900 */
+            --highlight: #0891b2; /* Cyan 600 */
+            --light-bg: #eff6ff; /* Blue 50 */
             --border: #cbd5e1;
         }
         
@@ -31,27 +31,27 @@
             border: none;
             border-bottom: 1.5px solid #94a3b8;
             width: 100%;
-            padding: 0 4px;
+            padding: 0 2px;
             font-size: 0.85rem;
-            color: #0f172a;
+            color: #1e293b;
             font-weight: 600;
             outline: none;
-            border-radius: 2px 2px 0 0;
-            height: 1.4rem;
+            border-radius: 0;
+            height: 1.35rem;
             transition: all 0.2s;
         }
         
         input:focus { 
             border-bottom: 2px solid var(--highlight); 
-            background-color: rgba(14, 116, 144, 0.05); 
+            background-color: rgba(8, 145, 178, 0.05); 
         }
         input::placeholder { color: #cbd5e1; font-weight: 400; font-size: 0.7rem; }
 
         /* Custom Checkbox */
         .custom-checkbox {
             appearance: none;
-            width: 1rem;
-            height: 1rem;
+            width: 0.95rem;
+            height: 0.95rem;
             border: 1.5px solid #475569;
             border-radius: 3px;
             display: inline-block;
@@ -75,13 +75,13 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: bold;
         }
 
         /* Bilingual Label Compact */
-        .bilingual-label { display: flex; flex-direction: column; line-height: 1.1; margin-bottom: 2px; }
-        .bilingual-label .en { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; color: #334155; letter-spacing: 0.025em; }
+        .bilingual-label { display: flex; flex-direction: column; line-height: 1.05; margin-bottom: 2px; }
+        .bilingual-label .en { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; color: #334155; letter-spacing: 0.02em; }
         .bilingual-label .ta { font-size: 0.6rem; color: #64748b; font-weight: 500; margin-top: 1px; }
 
         /* Page Container - Locked to A4 */
@@ -92,7 +92,7 @@
             margin: 0 auto;
             position: relative;
             box-sizing: border-box;
-            padding: 10mm 15mm;
+            padding: 10mm 14mm; /* Optimized Margins */
             display: flex;
             flex-direction: column;
             overflow: hidden; 
@@ -101,12 +101,12 @@
         .section-header {
             display: flex;
             align-items: center;
-            border-left: 4px solid var(--highlight);
+            border-left: 5px solid var(--highlight);
             padding-left: 10px;
             margin-bottom: 6px;
             background: linear-gradient(to right, #f0f9ff, transparent);
-            padding-top: 3px;
-            padding-bottom: 3px;
+            padding-top: 4px;
+            padding-bottom: 4px;
             border-radius: 0 4px 4px 0;
         }
 
@@ -139,20 +139,20 @@
     </div>
 
     <!-- A4 Container -->
-    <div class="page-container shadow-2xl border-t-[8px] border-slate-900">
+    <div class="page-container shadow-2xl border-t-[8px] border-indigo-900">
         
         <!-- Header -->
         <header class="flex justify-between items-center border-b border-slate-200 pb-3 mb-3">
             <div class="flex items-center gap-4">
-                <!-- Logo Zone -->
-                <div class="relative group cursor-pointer w-16 h-16 flex items-center justify-center border border-dashed border-slate-300 rounded-lg hover:border-cyan-600 transition-colors bg-slate-50 overflow-hidden" onclick="document.getElementById('logoInput').click()">
-                    <!-- PASTE YOUR GITHUB LOGO URL IN THE SRC BELOW if you want it hardcoded -->
-                    <img id="logoPreview" src="" class="absolute inset-0 w-full h-full object-contain p-1 hidden" alt="Logo">
-                    <div id="logoPlaceholder" class="text-center">
-                        <i data-lucide="image-plus" class="w-5 h-5 text-slate-400 mx-auto"></i>
-                        <span class="text-[0.55rem] text-slate-400 font-bold block mt-0.5">LOGO</span>
+                <!-- Logo Zone: Auto-loaded -->
+                <div class="w-16 h-16 flex items-center justify-center bg-white rounded-lg overflow-hidden">
+                    <img src="https://raw.githubusercontent.com/HEALTHFO/aaroku-care/main/logo.png" 
+                         class="w-full h-full object-contain" 
+                         alt="Aaroku Care Logo"
+                         onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='block';">
+                    <div id="logoFallback" class="hidden text-center border border-dashed border-gray-300 w-full h-full flex items-center justify-center rounded">
+                         <span class="text-[0.5rem] font-bold text-gray-400">LOGO</span>
                     </div>
-                    <input type="file" id="logoInput" class="hidden" accept="image/*" onchange="loadLogo(event)">
                 </div>
                 
                 <div>
@@ -174,7 +174,7 @@
         </header>
 
         <!-- Main Content -->
-        <div class="flex flex-col flex-grow gap-3">
+        <div class="flex flex-col flex-grow gap-2.5">
 
             <!-- Hospital Name -->
             <div class="flex items-end gap-3 bg-slate-50 p-2.5 rounded-md border border-slate-200 shadow-sm">
@@ -311,7 +311,7 @@
                             </p>
                         </li>
                         
-                        <!-- Clause 2: Notification & Repayment (Complex Logic) -->
+                        <!-- Clause 2: Notification & Repayment -->
                         <li class="pl-2">
                             <p class="text-[0.65rem] leading-tight text-slate-800 text-justify serif-font">
                                 <strong class="text-black">Notification & Repayment:</strong> I agree to intimate the Hospital within <strong>24 hours</strong> of receiving any insurance settlement. I undertake to settle the hospital dues within <strong>60 days</strong> from discharge. <span class="italic font-semibold">However</span>, if the insurance claim is settled earlier, I agree to transfer the amount to the Hospital within <strong>48 hours</strong> of such settlement.
@@ -321,7 +321,7 @@
                             </p>
                         </li>
 
-                        <!-- Clause 3: Breach of Trust (Replaced Fraud) -->
+                        <!-- Clause 3: Breach of Trust -->
                         <li class="pl-2">
                             <p class="text-[0.65rem] leading-tight text-slate-800 text-justify serif-font">
                                 If funds are settled to the Policy Holder, failure to transfer the amount within the stipulated time (48 hours) constitutes a serious <strong>breach of trust and contract</strong>, authorizing the Hospital/Aaroku Care to initiate recovery proceedings using the Security Instrument.
@@ -365,18 +365,6 @@
 
     <script>
         lucide.createIcons();
-        function loadLogo(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('logoPreview').src = e.target.result;
-                    document.getElementById('logoPreview').classList.remove('hidden');
-                    document.getElementById('logoPlaceholder').classList.add('hidden');
-                };
-                reader.readAsDataURL(file);
-            }
-        }
     </script>
 </body>
 </html>
