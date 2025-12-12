@@ -3,309 +3,185 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aaroku Care - Financial Consent Form</title>
+    <title>Aaroku Care - Secure Consent Form</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f0f0;
-            display: flex;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        /* A4 Paper Styling */
-        .page {
-            width: 210mm;
-            min-height: 297mm;
-            padding: 20mm;
-            margin: 0 auto;
-            background: white;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            box-sizing: border-box;
-            position: relative;
-        }
-
-        /* Layout Utilities */
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #008080; /* Teal matching the logo */
-            padding-bottom: 10px;
-        }
-
-        .logo-container img {
-            max-height: 80px;
-            width: auto;
-        }
-
-        h1 {
-            font-size: 18pt;
-            text-align: center;
-            text-transform: uppercase;
-            color: #333;
-            margin: 20px 0;
-            text-decoration: underline;
-        }
-
-        .section-title {
-            background-color: #eee;
-            padding: 5px 10px;
-            font-weight: bold;
-            margin-top: 20px;
-            margin-bottom: 15px;
-            border-left: 5px solid #008080;
-            font-size: 11pt;
-        }
-
-        .row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 10px;
-        }
-
-        .col {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .col.small { flex: 0.5; }
-
-        /* Form Inputs Styling to look like paper lines */
-        label {
-            font-size: 9pt;
-            font-weight: bold;
-            color: #555;
-            margin-bottom: 2px;
-        }
-
-        input[type="text"], input[type="number"], input[type="date"] {
-            border: none;
-            border-bottom: 1px dashed #333;
-            padding: 5px;
-            font-size: 10pt;
-            width: 100%;
-            outline: none;
-            font-family: inherit;
-            background: transparent;
-        }
-
-        input:focus {
-            border-bottom: 1px solid #008080;
-            background-color: #f9fdfd;
-        }
-
-        /* Checkbox Styling */
-        .checkbox-group {
-            display: flex;
-            gap: 20px;
-            margin-top: 5px;
-        }
+        body { font-family: 'Segoe UI', sans-serif; background: #eef2f3; padding: 20px; display: flex; justify-content: center; }
         
-        .terms-box {
-            border: 1px solid #ccc;
-            padding: 15px;
-            font-size: 10pt;
-            line-height: 1.5;
-            background-color: #fafafa;
-            margin-top: 10px;
+        /* A4 Page Styling */
+        .page {
+            width: 210mm; min-height: 297mm; padding: 20mm; background: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); position: relative;
         }
 
-        .terms-box ol {
-            padding-left: 20px;
-            margin: 0;
-        }
+        /* Branding */
+        .header { display: flex; align-items: center; border-bottom: 3px solid #009ca6; padding-bottom: 15px; margin-bottom: 20px; }
+        .logo-container img { max-width: 150px; }
+        .header-text { margin-left: auto; text-align: right; }
+        .header-text h2 { margin: 0; color: #009ca6; font-size: 22pt; }
+        
+        h1 { text-align: center; text-decoration: underline; font-size: 16pt; margin-bottom: 30px; }
 
-        .terms-box li {
-            margin-bottom: 8px;
-        }
+        /* Form Layout */
+        .row { display: flex; gap: 15px; margin-bottom: 15px; }
+        .col { flex: 1; display: flex; flex-direction: column; }
+        .col-small { flex: 0.5; }
+        
+        label { font-size: 9pt; font-weight: bold; color: #444; }
+        input { border: none; border-bottom: 1px solid #ccc; padding: 5px; font-size: 11pt; width: 100%; outline: none; }
+        input:focus { border-bottom: 2px solid #009ca6; background: #f0fdfd; }
 
-        .signatures {
-            margin-top: 50px;
-            display: flex;
-            justify-content: space-between;
-            gap: 20px;
+        .terms-box { background: #f9f9f9; border: 1px solid #ddd; padding: 15px; font-size: 9pt; margin-top: 20px; }
+        
+        /* Digital Audit Stamp (For Court Proof) */
+        .audit-trail {
+            margin-top: 40px;
+            padding: 10px;
+            border: 1px dashed #aaa;
+            background-color: #f4f4f4;
+            font-family: 'Courier New', monospace;
+            font-size: 8pt;
+            color: #333;
         }
+        .audit-row { display: flex; justify-content: space-between; margin-bottom: 3px; }
+        .geo-status { color: red; font-weight: bold; }
+        .geo-success { color: green; }
 
-        .sign-box {
-            flex: 1;
-            border-top: 1px solid #333;
-            padding-top: 5px;
-            text-align: center;
-            font-size: 10pt;
-            margin-top: 30px;
-        }
+        /* Buttons */
+        .controls { position: fixed; top: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; }
+        button { padding: 12px 20px; border: none; color: white; border-radius: 5px; cursor: pointer; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .btn-loc { background: #ff9800; }
+        .btn-dl { background: #009ca6; opacity: 0.5; pointer-events: none; } /* Disabled initially */
+        .btn-dl.active { opacity: 1; pointer-events: auto; }
 
-        /* Button to Print - Hidden in PDF */
-        .controls {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            gap: 10px;
-        }
-
-        button {
-            padding: 10px 20px;
-            background-color: #008080;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-            border-radius: 4px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-
-        button:hover {
-            background-color: #006666;
-        }
     </style>
 </head>
 <body>
 
     <div class="controls" data-html2canvas-ignore="true">
-        <button onclick="generatePDF()">Download PDF</button>
+        <button class="btn-loc" onclick="captureLocation()">📍 1. Click to Verify Location</button>
+        <button id="downloadBtn" class="btn-dl" onclick="generatePDF()">⬇️ 2. Download Signed PDF</button>
     </div>
 
     <div class="page" id="form-content">
         
         <div class="header">
-            <div class="logo-container">
-                <img src="logo.png" alt="Aaroku Care Logo"> 
-            </div>
-            <div style="text-align: right;">
-                <div style="font-size: 24px; font-weight: bold; color: #008080;">Aaroku Care</div>
-                <div style="font-size: 10pt; color: #666;">Care Beyond Compare</div>
+            <div class="logo-container"><img src="logo.png" alt="Logo"></div>
+            <div class="header-text">
+                <h2>Aaroku Care</h2>
+                <p>Care Beyond Compare</p>
             </div>
         </div>
 
         <h1>Financial Consent & Payment Undertaking</h1>
 
         <div class="row">
-            <div class="col">
-                <label>Date:</label>
-                <input type="date" id="date">
-            </div>
-            <div class="col">
-                <label>Hospital Name:</label>
-                <input type="text" placeholder="Enter Hospital Name">
-            </div>
+            <div class="col"><label>Date:</label><input type="text" id="dateDisplay" readonly></div>
+            <div class="col"><label>Hospital Name:</label><input type="text" placeholder="Enter Hospital Name"></div>
         </div>
 
-        <div class="section-title">1. Patient & Policy Holder Details</div>
-        
+        <div style="background:#e0f7fa; padding:5px; font-weight:bold; margin: 15px 0;">1. PATIENT DETAILS</div>
         <div class="row">
-            <div class="col">
-                <label>Patient Name:</label>
-                <input type="text">
-            </div>
-            <div class="col small">
-                <label>Age:</label>
-                <input type="number">
-            </div>
-            <div class="col small">
-                <label>Gender:</label>
-                <div class="checkbox-group">
-                    <label><input type="radio" name="gender"> Male</label>
-                    <label><input type="radio" name="gender"> Female</label>
-                    <label><input type="radio" name="gender"> Other</label>
-                </div>
-            </div>
+            <div class="col"><label>Patient Name:</label><input type="text"></div>
+            <div class="col-small"><label>Age:</label><input type="number"></div>
+            <div class="col-small"><label>Gender:</label><input type="text" placeholder="M / F"></div>
         </div>
-
         <div class="row">
-            <div class="col">
-                <label>Patient Aadhaar No:</label>
-                <input type="text" maxlength="12">
-            </div>
-            <div class="col">
-                <label>Insured Aadhaar No:</label>
-                <input type="text" maxlength="12">
-            </div>
+            <div class="col"><label>Patient Aadhaar:</label><input type="text"></div>
+            <div class="col"><label>Insured Aadhaar:</label><input type="text"></div>
         </div>
 
-        <div class="section-title">2. Borrower & Payment Details</div>
-
+        <div style="background:#e0f7fa; padding:5px; font-weight:bold; margin: 15px 0;">2. BORROWER DETAILS</div>
+        <div class="row"><div class="col"><label>Borrower Name:</label><input type="text"></div></div>
         <div class="row">
-            <div class="col">
-                <label>Borrower Name:</label>
-                <input type="text">
-            </div>
+            <div class="col"><label>Bank Name:</label><input type="text"></div>
+            <div class="col"><label>Cheque No:</label><input type="text"></div>
+            <div class="col"><label>Amount (₹):</label><input type="number"></div>
         </div>
-
-        <div class="row">
-            <div class="col">
-                <label>Bank Name:</label>
-                <input type="text">
-            </div>
-            <div class="col">
-                <label>Cheque Number:</label>
-                <input type="text">
-            </div>
-            <div class="col">
-                <label>Total Amount (INR):</label>
-                <input type="number">
-            </div>
-        </div>
-
-        <div class="row" style="margin-top: 15px;">
-            <div class="col">
-                <label style="font-size: 11pt;">E-NACH Status / Mode of Payment:</label>
-                <div class="checkbox-group" style="margin-top: 10px;">
-                    <label><input type="checkbox"> NACH (National Automated Clearing House)</label>
-                    <label><input type="checkbox"> CHEQUE</label>
-                </div>
-            </div>
-        </div>
-
-        <div class="section-title">3. Terms of Consent</div>
 
         <div class="terms-box">
-            <ol>
-                <li><strong>Settlement Timeline:</strong> The settlement to the hospital should be paid within <strong>60 days</strong> from the date of discharge.</li>
-                <li><strong>Liability:</strong> In case of delay or rejection of the claim, the <strong>Borrower</strong> will bear the full liability and agrees to settle the dues immediately.</li>
-                <li><strong>Insurance Intimation:</strong> In case settlement is received directly from the Insurance Company (Reimbursement), the <strong>Policy Holder</strong> must intimate <strong>Aaroku Care</strong> or the <strong>Hospital</strong> within <strong>24 hours</strong>.</li>
-            </ol>
+            <strong>3. TERMS OF UNDERTAKING:</strong>
+            <ul style="margin:5px 0 0 20px;">
+                <li>Settlement must be paid within <strong>60 days</strong> of discharge.</li>
+                <li>Borrower assumes full liability if insurance rejects or delays payment.</li>
+                <li>Policy Holder must intimate Aaroku Care within <strong>24 hours</strong> of receiving reimbursement.</li>
+            </ul>
         </div>
 
-        <div class="signatures">
-            <div class="sign-box">
-                Signature of Borrower
-            </div>
-            <div class="sign-box">
-                Signature of Patient / Policy Holder
-            </div>
-            <div class="sign-box">
-                Authorized Signatory<br>(Aaroku Care)
+        <div class="row" style="margin-top: 50px;">
+            <div class="col" style="text-align:center; border-top:1px solid #333; padding-top:5px;">Signature of Borrower</div>
+            <div class="col" style="text-align:center; border-top:1px solid #333; padding-top:5px;">Signature of Patient</div>
+        </div>
+
+        <div class="audit-trail">
+            <div style="text-align:center; font-weight:bold; border-bottom:1px dashed #aaa; margin-bottom:5px;">DIGITAL EXECUTION RECORD</div>
+            <div class="audit-row"><span>Timestamp:</span> <span id="audit-time">Pending...</span></div>
+            <div class="audit-row"><span>IP Address:</span> <span id="audit-ip">Fetching...</span></div>
+            <div class="audit-row"><span>Device ID:</span> <span id="audit-device">Browser/Unknown</span></div>
+            <div class="audit-row"><span>Location (GPS):</span> <span id="audit-loc" class="geo-status">⚠️ Location Verification Required</span></div>
+            <div style="margin-top:5px; font-size:7pt; color:#666; text-align:center;">
+                * This document was digitally generated and geotagged. Location data allows verification of presence at the time of signing.
             </div>
         </div>
 
     </div>
 
     <script>
-        // Auto-fill today's date
-        document.getElementById('date').valueAsDate = new Date();
+        // 1. Auto-fill Date & Device Info
+        document.getElementById('dateDisplay').value = new Date().toLocaleDateString();
+        document.getElementById('audit-device').innerText = navigator.userAgent;
 
+        // 2. Fetch IP Address (for extra proof)
+        fetch('https://api.ipify.org?format=json')
+            .then(response => response.json())
+            .then(data => document.getElementById('audit-ip').innerText = data.ip)
+            .catch(err => document.getElementById('audit-ip').innerText = "Hidden/Unavailable");
+
+        // 3. Capture Location
+        function captureLocation() {
+            const locSpan = document.getElementById('audit-loc');
+            const dlBtn = document.getElementById('downloadBtn');
+            const timeSpan = document.getElementById('audit-time');
+
+            if (!navigator.geolocation) {
+                alert("Geolocation is not supported by this browser.");
+                return;
+            }
+
+            locSpan.innerText = "Triangulating satellite signal...";
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude.toFixed(6);
+                    const long = position.coords.longitude.toFixed(6);
+                    const acc = position.coords.accuracy.toFixed(1);
+                    
+                    // Update Audit Trail
+                    locSpan.innerText = `Lat: ${lat}, Long: ${long} (Accuracy: ${acc}m)`;
+                    locSpan.className = "geo-success";
+                    timeSpan.innerText = new Date().toString();
+                    
+                    // Enable Download
+                    dlBtn.classList.add('active');
+                    alert("✅ Location Verified! You can now download the form.");
+                },
+                (error) => {
+                    locSpan.innerText = "❌ User Denied Location Access";
+                    alert("⚠️ Location access is required to validate this legal form.");
+                }
+            );
+        }
+
+        // 4. Generate PDF
         function generatePDF() {
-            // Select the element we want to export
             const element = document.getElementById('form-content');
-            
-            // Configuration options for the PDF
-            const opt = {
-                margin:       0,
-                filename:     'Aaroku_Consent_Form.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2 }, // Higher scale = better quality
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-
-            // Generate and save
-            html2pdf().set(opt).from(element).save();
+            html2pdf().set({
+                margin: 0,
+                filename: 'Signed_Consent_Form.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            }).from(element).save();
         }
     </script>
 </body>
