@@ -3,185 +3,379 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aaroku Care - Secure Consent Form</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <title>Aaroku Care - Healthflo Consent Form</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Serif:wght@400;600;700&family=Noto+Sans+Tamil:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #eef2f3; padding: 20px; display: flex; justify-content: center; }
+        :root {
+            --primary: #0f172a; /* Slate 900 */
+            --accent: #1e3a8a; /* Royal Navy */
+            --highlight: #0e7490; /* Teal 700 */
+            --light-bg: #f0f9ff; /* Sky 50 */
+            --border: #cbd5e1;
+        }
         
-        /* A4 Page Styling */
-        .page {
-            width: 210mm; min-height: 297mm; padding: 20mm; background: white;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1); position: relative;
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #525252;
+            -webkit-print-color-adjust: exact;
         }
 
-        /* Branding */
-        .header { display: flex; align-items: center; border-bottom: 3px solid #009ca6; padding-bottom: 15px; margin-bottom: 20px; }
-        .logo-container img { max-width: 150px; }
-        .header-text { margin-left: auto; text-align: right; }
-        .header-text h2 { margin: 0; color: #009ca6; font-size: 22pt; }
-        
-        h1 { text-align: center; text-decoration: underline; font-size: 16pt; margin-bottom: 30px; }
+        .serif-font { font-family: 'Noto Serif', serif; }
+        .tamil-text { font-family: 'Noto Sans Tamil', sans-serif; }
 
-        /* Form Layout */
-        .row { display: flex; gap: 15px; margin-bottom: 15px; }
-        .col { flex: 1; display: flex; flex-direction: column; }
-        .col-small { flex: 0.5; }
-        
-        label { font-size: 9pt; font-weight: bold; color: #444; }
-        input { border: none; border-bottom: 1px solid #ccc; padding: 5px; font-size: 11pt; width: 100%; outline: none; }
-        input:focus { border-bottom: 2px solid #009ca6; background: #f0fdfd; }
-
-        .terms-box { background: #f9f9f9; border: 1px solid #ddd; padding: 15px; font-size: 9pt; margin-top: 20px; }
-        
-        /* Digital Audit Stamp (For Court Proof) */
-        .audit-trail {
-            margin-top: 40px;
-            padding: 10px;
-            border: 1px dashed #aaa;
-            background-color: #f4f4f4;
-            font-family: 'Courier New', monospace;
-            font-size: 8pt;
-            color: #333;
+        /* Professional Input Styling */
+        input[type="text"], input[type="number"], input[type="date"], input[type="tel"] {
+            background: transparent;
+            border: none;
+            border-bottom: 1.5px solid #94a3b8;
+            width: 100%;
+            padding: 0 4px;
+            font-size: 0.85rem;
+            color: #0f172a;
+            font-weight: 600;
+            outline: none;
+            border-radius: 2px 2px 0 0;
+            height: 1.4rem;
+            transition: all 0.2s;
         }
-        .audit-row { display: flex; justify-content: space-between; margin-bottom: 3px; }
-        .geo-status { color: red; font-weight: bold; }
-        .geo-success { color: green; }
+        
+        input:focus { 
+            border-bottom: 2px solid var(--highlight); 
+            background-color: rgba(14, 116, 144, 0.05); 
+        }
+        input::placeholder { color: #cbd5e1; font-weight: 400; font-size: 0.7rem; }
 
-        /* Buttons */
-        .controls { position: fixed; top: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; }
-        button { padding: 12px 20px; border: none; color: white; border-radius: 5px; cursor: pointer; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .btn-loc { background: #ff9800; }
-        .btn-dl { background: #009ca6; opacity: 0.5; pointer-events: none; } /* Disabled initially */
-        .btn-dl.active { opacity: 1; pointer-events: auto; }
+        /* Custom Checkbox */
+        .custom-checkbox {
+            appearance: none;
+            width: 1rem;
+            height: 1rem;
+            border: 1.5px solid #475569;
+            border-radius: 3px;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 0.4rem;
+            position: relative;
+            cursor: pointer;
+            background-color: white;
+            transition: all 0.2s;
+        }
+        
+        .custom-checkbox:checked {
+            background-color: var(--highlight);
+            border-color: var(--highlight);
+        }
+        
+        .custom-checkbox:checked::after {
+            content: '✓';
+            color: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
 
+        /* Bilingual Label Compact */
+        .bilingual-label { display: flex; flex-direction: column; line-height: 1.1; margin-bottom: 2px; }
+        .bilingual-label .en { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; color: #334155; letter-spacing: 0.025em; }
+        .bilingual-label .ta { font-size: 0.6rem; color: #64748b; font-weight: 500; margin-top: 1px; }
+
+        /* Page Container - Locked to A4 */
+        .page-container {
+            width: 210mm;
+            height: 296mm; /* A4 Height */
+            background: white;
+            margin: 0 auto;
+            position: relative;
+            box-sizing: border-box;
+            padding: 10mm 15mm;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; 
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            border-left: 4px solid var(--highlight);
+            padding-left: 10px;
+            margin-bottom: 6px;
+            background: linear-gradient(to right, #f0f9ff, transparent);
+            padding-top: 3px;
+            padding-bottom: 3px;
+            border-radius: 0 4px 4px 0;
+        }
+
+        @media print {
+            body { background: none; margin: 0; padding: 0; }
+            .no-print { display: none !important; }
+            .page-container {
+                box-shadow: none;
+                margin: 0;
+                width: 100%;
+                height: 100%;
+                page-break-after: avoid;
+                page-break-before: avoid;
+            }
+            @page {
+                size: A4;
+                margin: 0; 
+            }
+        }
     </style>
 </head>
-<body>
+<body class="flex justify-center items-start min-h-screen py-8">
 
-    <div class="controls" data-html2canvas-ignore="true">
-        <button class="btn-loc" onclick="captureLocation()">📍 1. Click to Verify Location</button>
-        <button id="downloadBtn" class="btn-dl" onclick="generatePDF()">⬇️ 2. Download Signed PDF</button>
+    <!-- Control Panel -->
+    <div class="fixed bottom-6 right-6 flex flex-col gap-3 no-print z-50">
+        <button onclick="window.print()" class="flex items-center gap-2 bg-slate-800 hover:bg-slate-900 text-white px-6 py-3 rounded-full shadow-xl font-semibold transition-all border border-slate-700">
+            <i data-lucide="printer" class="w-4 h-4"></i>
+            Print / Save PDF
+        </button>
     </div>
 
-    <div class="page" id="form-content">
+    <!-- A4 Container -->
+    <div class="page-container shadow-2xl border-t-[8px] border-slate-900">
         
-        <div class="header">
-            <div class="logo-container"><img src="logo.png" alt="Logo"></div>
-            <div class="header-text">
-                <h2>Aaroku Care</h2>
-                <p>Care Beyond Compare</p>
+        <!-- Header -->
+        <header class="flex justify-between items-center border-b border-slate-200 pb-3 mb-3">
+            <div class="flex items-center gap-4">
+                <!-- Logo Zone -->
+                <div class="relative group cursor-pointer w-16 h-16 flex items-center justify-center border border-dashed border-slate-300 rounded-lg hover:border-cyan-600 transition-colors bg-slate-50 overflow-hidden" onclick="document.getElementById('logoInput').click()">
+                    <!-- PASTE YOUR GITHUB LOGO URL IN THE SRC BELOW if you want it hardcoded -->
+                    <img id="logoPreview" src="" class="absolute inset-0 w-full h-full object-contain p-1 hidden" alt="Logo">
+                    <div id="logoPlaceholder" class="text-center">
+                        <i data-lucide="image-plus" class="w-5 h-5 text-slate-400 mx-auto"></i>
+                        <span class="text-[0.55rem] text-slate-400 font-bold block mt-0.5">LOGO</span>
+                    </div>
+                    <input type="file" id="logoInput" class="hidden" accept="image/*" onchange="loadLogo(event)">
+                </div>
+                
+                <div>
+                    <h1 class="text-3xl font-black text-slate-900 tracking-tight leading-none">AAROKU CARE</h1>
+                    <div class="flex flex-col mt-1">
+                        <span class="text-cyan-700 text-[0.65rem] font-bold uppercase tracking-widest">Healthflo Division</span>
+                        <span class="text-slate-500 tamil-text text-[0.65rem] font-medium">ஹெல்த்ஃப்ளோ பிரிவு</span>
+                    </div>
+                </div>
             </div>
-        </div>
-
-        <h1>Financial Consent & Payment Undertaking</h1>
-
-        <div class="row">
-            <div class="col"><label>Date:</label><input type="text" id="dateDisplay" readonly></div>
-            <div class="col"><label>Hospital Name:</label><input type="text" placeholder="Enter Hospital Name"></div>
-        </div>
-
-        <div style="background:#e0f7fa; padding:5px; font-weight:bold; margin: 15px 0;">1. PATIENT DETAILS</div>
-        <div class="row">
-            <div class="col"><label>Patient Name:</label><input type="text"></div>
-            <div class="col-small"><label>Age:</label><input type="number"></div>
-            <div class="col-small"><label>Gender:</label><input type="text" placeholder="M / F"></div>
-        </div>
-        <div class="row">
-            <div class="col"><label>Patient Aadhaar:</label><input type="text"></div>
-            <div class="col"><label>Insured Aadhaar:</label><input type="text"></div>
-        </div>
-
-        <div style="background:#e0f7fa; padding:5px; font-weight:bold; margin: 15px 0;">2. BORROWER DETAILS</div>
-        <div class="row"><div class="col"><label>Borrower Name:</label><input type="text"></div></div>
-        <div class="row">
-            <div class="col"><label>Bank Name:</label><input type="text"></div>
-            <div class="col"><label>Cheque No:</label><input type="text"></div>
-            <div class="col"><label>Amount (₹):</label><input type="number"></div>
-        </div>
-
-        <div class="terms-box">
-            <strong>3. TERMS OF UNDERTAKING:</strong>
-            <ul style="margin:5px 0 0 20px;">
-                <li>Settlement must be paid within <strong>60 days</strong> of discharge.</li>
-                <li>Borrower assumes full liability if insurance rejects or delays payment.</li>
-                <li>Policy Holder must intimate Aaroku Care within <strong>24 hours</strong> of receiving reimbursement.</li>
-            </ul>
-        </div>
-
-        <div class="row" style="margin-top: 50px;">
-            <div class="col" style="text-align:center; border-top:1px solid #333; padding-top:5px;">Signature of Borrower</div>
-            <div class="col" style="text-align:center; border-top:1px solid #333; padding-top:5px;">Signature of Patient</div>
-        </div>
-
-        <div class="audit-trail">
-            <div style="text-align:center; font-weight:bold; border-bottom:1px dashed #aaa; margin-bottom:5px;">DIGITAL EXECUTION RECORD</div>
-            <div class="audit-row"><span>Timestamp:</span> <span id="audit-time">Pending...</span></div>
-            <div class="audit-row"><span>IP Address:</span> <span id="audit-ip">Fetching...</span></div>
-            <div class="audit-row"><span>Device ID:</span> <span id="audit-device">Browser/Unknown</span></div>
-            <div class="audit-row"><span>Location (GPS):</span> <span id="audit-loc" class="geo-status">⚠️ Location Verification Required</span></div>
-            <div style="margin-top:5px; font-size:7pt; color:#666; text-align:center;">
-                * This document was digitally generated and geotagged. Location data allows verification of presence at the time of signing.
+            <div class="text-right">
+                <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wide">Financial Consent Form</h2>
+                <p class="text-[0.65rem] text-slate-500 tamil-text font-medium">நிதிக் கட்டண ஒப்புதல் படிவம்</p>
+                <div class="mt-2 flex justify-end items-center gap-2">
+                    <span class="text-[0.7rem] font-bold text-slate-600">DATE / தேதி:</span>
+                    <input type="text" placeholder="DD / MM / YYYY" class="w-24 text-center border-b border-slate-300 text-sm font-mono bg-slate-50">
+                </div>
             </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="flex flex-col flex-grow gap-3">
+
+            <!-- Hospital Name -->
+            <div class="flex items-end gap-3 bg-slate-50 p-2.5 rounded-md border border-slate-200 shadow-sm">
+                <div class="bilingual-label w-32 flex-shrink-0">
+                    <span class="en text-slate-800">Hospital Name</span>
+                    <span class="ta">மருத்துவமனை பெயர்</span>
+                </div>
+                <input type="text" class="font-bold text-base text-slate-900 bg-transparent !border-b-2 !border-slate-300" placeholder="">
+            </div>
+
+            <!-- Section I: Patient -->
+            <section>
+                <div class="section-header">
+                    <div class="flex flex-col leading-none">
+                        <span class="text-[0.75rem] font-bold text-slate-800 uppercase tracking-wide">I. Patient Details</span>
+                        <span class="text-[0.55rem] text-slate-500 tamil-text mt-0.5">நோயாளி விவரங்கள்</span>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-12 gap-x-5 gap-y-2.5 px-2">
+                    <div class="col-span-6">
+                        <div class="bilingual-label"><span class="en">Patient Name</span><span class="ta">நோயாளி பெயர்</span></div>
+                        <input type="text">
+                    </div>
+                    <div class="col-span-2">
+                        <div class="bilingual-label"><span class="en">Age</span><span class="ta">வயது</span></div>
+                        <input type="number">
+                    </div>
+                    <div class="col-span-2">
+                        <div class="bilingual-label"><span class="en">Gender</span><span class="ta">பாலினம்</span></div>
+                        <input type="text" placeholder="M/F">
+                    </div>
+                    <div class="col-span-2">
+                        <div class="bilingual-label"><span class="en">Mobile No.</span><span class="ta">கைபேசி எண்</span></div>
+                        <input type="tel">
+                    </div>
+
+                    <div class="col-span-6">
+                        <div class="bilingual-label"><span class="en">Patient Aadhaar No.</span><span class="ta">நோயாளி ஆதார் எண்</span></div>
+                        <input type="text" class="tracking-widest">
+                    </div>
+                    <div class="col-span-6">
+                        <div class="bilingual-label"><span class="en">Insured Aadhaar No.</span><span class="ta">காப்பீட்டாளர் ஆதார் எண்</span></div>
+                        <input type="text" class="tracking-widest">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section II: Borrower -->
+            <section>
+                <div class="section-header">
+                    <div class="flex flex-col leading-none">
+                        <span class="text-[0.75rem] font-bold text-slate-800 uppercase tracking-wide">II. Borrower Details</span>
+                        <span class="text-[0.55rem] text-slate-500 tamil-text mt-0.5">வாடிக்கையாளர் விவரங்கள்</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-x-5 gap-y-2.5 px-2">
+                    <div class="col-span-6">
+                        <div class="bilingual-label"><span class="en">Borrower Name (Vadikaiyalar)</span><span class="ta">வாடிக்கையாளர் பெயர்</span></div>
+                        <input type="text">
+                    </div>
+                    <div class="col-span-6">
+                        <div class="bilingual-label"><span class="en">Borrower Mobile No.</span><span class="ta">வாடிக்கையாளர் கைபேசி எண்</span></div>
+                        <input type="tel">
+                    </div>
+                    <div class="col-span-12">
+                        <div class="bilingual-label"><span class="en">Bank Name</span><span class="ta">வங்கி பெயர்</span></div>
+                        <input type="text">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section III: Payment -->
+            <section>
+                <div class="section-header !border-cyan-600 !bg-cyan-50/50">
+                    <div class="flex flex-col leading-none">
+                        <span class="text-[0.75rem] font-bold text-cyan-900 uppercase tracking-wide">III. Security & Repayment Instrument</span>
+                        <span class="text-[0.55rem] text-cyan-700 tamil-text mt-0.5">பாதுகாப்பு & திருப்பிச் செலுத்துதல் விவரங்கள்</span>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-8 px-4 mt-2">
+                    <!-- NACH -->
+                    <div class="border-r border-slate-200 pr-6">
+                        <label class="flex items-center cursor-pointer mb-2 group">
+                            <input type="checkbox" class="custom-checkbox"> 
+                            <span class="text-xs font-bold text-slate-800 ml-2 group-hover:text-cyan-700 transition-colors">NACH Mandate</span>
+                        </label>
+                        <div class="pl-6">
+                            <div class="bilingual-label"><span class="en">NACH Max Amount (₹)</span><span class="ta">நாச் தொகை</span></div>
+                            <input type="text" placeholder="₹ 0.00" class="font-mono text-base bg-white/50 px-1 border-slate-300">
+                        </div>
+                    </div>
+
+                    <!-- Cheque -->
+                    <div>
+                        <label class="flex items-center cursor-pointer mb-2 group">
+                            <input type="checkbox" class="custom-checkbox"> 
+                            <div class="flex flex-col ml-2 leading-none">
+                                <span class="text-xs font-bold text-slate-800 group-hover:text-cyan-700 transition-colors">Security Cheque</span>
+                                <span class="text-[0.55rem] text-slate-500 tamil-text mt-0.5">பாதுகாப்பு காசோலை</span>
+                            </div>
+                        </label>
+                        <div class="pl-6 grid grid-cols-2 gap-4">
+                            <div>
+                                <div class="bilingual-label"><span class="en">Amount (₹)</span><span class="ta">தொகை</span></div>
+                                <input type="text" placeholder="₹ 0.00" class="font-mono text-base bg-white/50 px-1 border-slate-300">
+                            </div>
+                            <div>
+                                <div class="bilingual-label"><span class="en">Cheque No (Last 4)</span><span class="ta">காசோலை எண்</span></div>
+                                <input type="text" placeholder="XXXX" class="font-mono text-center text-base bg-white/50 px-1 border-slate-300" maxlength="4">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Legal Declaration -->
+            <section class="mt-1">
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
+                    <div class="flex items-center gap-2 mb-2 border-b border-slate-300 pb-1">
+                        <i data-lucide="scale" class="w-4 h-4 text-slate-700"></i>
+                        <strong class="text-slate-900 uppercase tracking-wide text-[0.65rem]">Declaration of Liability / உறுதிமொழி</strong>
+                    </div>
+                    <ol class="list-decimal pl-4 space-y-1.5">
+                        <!-- Clause 1: Conditional Liability -->
+                        <li class="pl-2">
+                            <p class="text-[0.65rem] leading-tight text-slate-800 text-justify serif-font">
+                                <strong class="text-black">Conditional Liability:</strong> I acknowledge that I am liable to pay the hospital bill <span class="underline decoration-slate-400 decoration-1">ONLY IF</span> the health insurance claim is <strong>REJECTED</strong> or <strong>DELAYED beyond 60 days</strong>.
+                            </p>
+                            <p class="text-[0.55rem] text-slate-500 tamil-text mt-0.5 leading-tight">
+                                மருத்துவ காப்பீட்டு கோரிக்கை நிராகரிக்கப்பட்டாலோ அல்லது 60 நாட்களுக்கு மேல் தாமதமானாலோ மட்டுமே மருத்துவமனை கட்டணத்தை செலுத்த நான் கடமைப்பட்டுள்ளேன்.
+                            </p>
+                        </li>
+                        
+                        <!-- Clause 2: Notification & Repayment (Complex Logic) -->
+                        <li class="pl-2">
+                            <p class="text-[0.65rem] leading-tight text-slate-800 text-justify serif-font">
+                                <strong class="text-black">Notification & Repayment:</strong> I agree to intimate the Hospital within <strong>24 hours</strong> of receiving any insurance settlement. I undertake to settle the hospital dues within <strong>60 days</strong> from discharge. <span class="italic font-semibold">However</span>, if the insurance claim is settled earlier, I agree to transfer the amount to the Hospital within <strong>48 hours</strong> of such settlement.
+                            </p>
+                            <p class="text-[0.55rem] text-slate-500 tamil-text mt-0.5 leading-tight">
+                                காப்பீட்டுத் தொகை கிடைத்த 24 மணி நேரத்திற்குள் மருத்துவமனைக்கு தகவல் தெரிவிக்கிறேன். டிஸ்சார்ஜ் செய்யப்பட்ட 60 நாட்களுக்குள் கட்டணத்தை செலுத்த வேண்டும். இருப்பினும், காப்பீட்டுத் தொகை அதற்கு முன்பே கிடைத்தால், கிடைத்த 48 மணி நேரத்திற்குள் அத்தொகையை மருத்துவமனைக்கு செலுத்த உறுதியளிக்கிறேன்.
+                            </p>
+                        </li>
+
+                        <!-- Clause 3: Breach of Trust (Replaced Fraud) -->
+                        <li class="pl-2">
+                            <p class="text-[0.65rem] leading-tight text-slate-800 text-justify serif-font">
+                                If funds are settled to the Policy Holder, failure to transfer the amount within the stipulated time (48 hours) constitutes a serious <strong>breach of trust and contract</strong>, authorizing the Hospital/Aaroku Care to initiate recovery proceedings using the Security Instrument.
+                            </p>
+                            <p class="text-[0.55rem] text-slate-500 tamil-text mt-0.5 leading-tight">
+                                காப்பீட்டுப் பணம் பாலிசிதாரருக்கு கிடைத்து, அதை 48 மணி நேரத்திற்குள் மருத்துவமனைக்கு மாற்றத் தவறினால், அது நம்பிக்கை மீறலாகக் கருதப்படும் மற்றும் சட்டப்பூர்வ நடவடிக்கைக்கு வழிவகுக்கும்.
+                            </p>
+                        </li>
+                    </ol>
+                </div>
+            </section>
         </div>
+
+        <!-- Footer -->
+        <footer class="mt-auto pt-3 border-t-2 border-slate-800">
+            <div class="flex justify-between items-end">
+                <div class="text-center w-1/3">
+                    <div class="h-10"></div>
+                    <div class="border-t border-slate-900 pt-1">
+                        <div class="text-[0.65rem] font-bold text-slate-900 uppercase">Signature of Borrower</div>
+                        <div class="text-[0.55rem] text-slate-500 tamil-text">வாடிக்கையாளர் கையப்பம்</div>
+                    </div>
+                </div>
+                
+                <div class="text-center w-1/3">
+                    <div class="h-10"></div>
+                    <div class="border-t border-slate-900 pt-1">
+                        <div class="text-[0.65rem] font-bold text-slate-900 uppercase">Hospital Representative</div>
+                        <div class="text-[0.55rem] text-slate-500 tamil-text">மருத்துவமனை பிரதிநிதி</div>
+                        <div class="text-[0.55rem] text-slate-400 mt-0.5">(Sign & Seal)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-3 flex items-center justify-center gap-1.5 opacity-60">
+                <i data-lucide="lock" class="w-3 h-3 text-slate-500"></i>
+                <span class="text-[0.5rem] text-slate-500 uppercase tracking-widest font-semibold">Confidential Financial Document | Aaroku Care</span>
+            </div>
+        </footer>
 
     </div>
 
     <script>
-        // 1. Auto-fill Date & Device Info
-        document.getElementById('dateDisplay').value = new Date().toLocaleDateString();
-        document.getElementById('audit-device').innerText = navigator.userAgent;
-
-        // 2. Fetch IP Address (for extra proof)
-        fetch('https://api.ipify.org?format=json')
-            .then(response => response.json())
-            .then(data => document.getElementById('audit-ip').innerText = data.ip)
-            .catch(err => document.getElementById('audit-ip').innerText = "Hidden/Unavailable");
-
-        // 3. Capture Location
-        function captureLocation() {
-            const locSpan = document.getElementById('audit-loc');
-            const dlBtn = document.getElementById('downloadBtn');
-            const timeSpan = document.getElementById('audit-time');
-
-            if (!navigator.geolocation) {
-                alert("Geolocation is not supported by this browser.");
-                return;
+        lucide.createIcons();
+        function loadLogo(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('logoPreview').src = e.target.result;
+                    document.getElementById('logoPreview').classList.remove('hidden');
+                    document.getElementById('logoPlaceholder').classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
             }
-
-            locSpan.innerText = "Triangulating satellite signal...";
-
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const lat = position.coords.latitude.toFixed(6);
-                    const long = position.coords.longitude.toFixed(6);
-                    const acc = position.coords.accuracy.toFixed(1);
-                    
-                    // Update Audit Trail
-                    locSpan.innerText = `Lat: ${lat}, Long: ${long} (Accuracy: ${acc}m)`;
-                    locSpan.className = "geo-success";
-                    timeSpan.innerText = new Date().toString();
-                    
-                    // Enable Download
-                    dlBtn.classList.add('active');
-                    alert("✅ Location Verified! You can now download the form.");
-                },
-                (error) => {
-                    locSpan.innerText = "❌ User Denied Location Access";
-                    alert("⚠️ Location access is required to validate this legal form.");
-                }
-            );
-        }
-
-        // 4. Generate PDF
-        function generatePDF() {
-            const element = document.getElementById('form-content');
-            html2pdf().set({
-                margin: 0,
-                filename: 'Signed_Consent_Form.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            }).from(element).save();
         }
     </script>
 </body>
