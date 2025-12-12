@@ -7,6 +7,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Serif:wght@400;600;700&family=Noto+Sans+Tamil:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
+
     <style>
         :root {
             --primary: #0f172a; /* Slate 900 */
@@ -20,6 +26,12 @@
             font-family: 'Inter', sans-serif;
             background-color: #525252;
             -webkit-print-color-adjust: exact;
+            /* Center the content */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
         }
 
         .serif-font { font-family: 'Noto Serif', serif; }
@@ -37,7 +49,7 @@
             font-weight: 600;
             outline: none;
             border-radius: 0;
-            height: 1.25rem; /* Reduced height */
+            height: 1.25rem;
             transition: all 0.2s;
         }
         
@@ -126,17 +138,83 @@
                 margin: 0; 
             }
         }
+        
+        /* Toast Notification */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 4px;
+            padding: 16px;
+            position: fixed;
+            z-index: 100;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Styling for the copy-ready ID field */
+        #documentIdContainer {
+            margin-left: 1rem;
+            display: none; /* Hide until saved */
+            align-items: center;
+            background: #475569;
+            border-radius: 4px;
+            padding: 0 0.5rem;
+        }
+        #documentIdDisplay {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 12px;
+            font-family: monospace;
+            padding: 4px 0;
+            width: 120px;
+        }
     </style>
 </head>
 <body class="flex justify-center items-start min-h-screen py-6">
 
-    <!-- Control Panel -->
-    <div class="fixed bottom-6 right-6 flex flex-col gap-3 no-print z-50">
-        <button onclick="window.print()" class="flex items-center gap-2 bg-slate-800 hover:bg-slate-900 text-white px-6 py-3 rounded-full shadow-xl font-semibold transition-all border border-slate-700">
-            <i data-lucide="printer" class="w-4 h-4"></i>
-            Print / Save PDF
-        </button>
+    <!-- Cloud Control Panel (No Print) -->
+    <div class="fixed top-0 left-0 w-full bg-slate-800 text-white p-3 no-print z-50 shadow-md flex justify-between items-center px-8">
+        <div class="flex items-center gap-3">
+            <span class="font-bold text-sm tracking-wide text-cyan-400">AAROKU CLOUD FORM</span>
+            <span id="saveStatus" class="text-xs text-gray-400 italic">Unsaved</span>
+        </div>
+        
+        <!-- Document ID and Copy -->
+        <div class="flex items-center">
+            <div id="documentIdContainer">
+                <span class="text-gray-300 text-xs font-semibold mr-2">ID:</span>
+                <input type="text" id="documentIdDisplay" value="" readonly>
+                <button onclick="copyDocumentId()" class="bg-indigo-600 hover:bg-indigo-700 p-1 rounded ml-2">
+                     <i data-lucide="copy" class="w-3 h-3 text-white"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="flex gap-3">
+            <button onclick="saveFormData()" class="flex items-center gap-2 bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-1.5 rounded text-sm font-semibold transition-all">
+                <i data-lucide="link" class="w-4 h-4"></i> Save & Get Link
+            </button>
+            <button onclick="window.print()" class="flex items-center gap-2 bg-white hover:bg-gray-100 text-slate-900 px-4 py-1.5 rounded text-sm font-semibold transition-all">
+                <i data-lucide="printer" class="w-4 h-4"></i> Print PDF
+            </button>
+        </div>
     </div>
+    
+    <!-- Spacer for fixed header -->
+    <div class="h-16 w-full no-print"></div>
 
     <!-- A4 Container -->
     <div class="page-container shadow-2xl border-t-[8px] border-indigo-900">
@@ -176,7 +254,7 @@
                 <p class="text-[0.65rem] text-slate-500 tamil-text font-medium">நிதிக் கட்டண ஒப்புதல் படிவம்</p>
                 <div class="mt-2 flex justify-end items-center gap-2">
                     <span class="text-[0.7rem] font-bold text-slate-600">DATE / தேதி:</span>
-                    <input type="text" placeholder="DD / MM / YYYY" class="w-24 text-center border-b border-slate-300 text-sm font-mono bg-slate-50">
+                    <input type="text" id="date" placeholder="DD / MM / YYYY" class="w-24 text-center border-b border-slate-300 text-sm font-mono bg-slate-50">
                 </div>
             </div>
         </header>
@@ -190,7 +268,7 @@
                     <span class="en text-slate-800">Hospital Name</span>
                     <span class="ta">மருத்துவமனை பெயர்</span>
                 </div>
-                <input type="text" class="font-bold text-base text-slate-900 bg-transparent !border-b-2 !border-slate-300" placeholder="">
+                <input type="text" id="hospitalName" class="font-bold text-base text-slate-900 bg-transparent !border-b-2 !border-slate-300" placeholder="">
             </div>
 
             <!-- Section I: Patient -->
@@ -205,28 +283,28 @@
                 <div class="grid grid-cols-12 gap-x-5 gap-y-1.5 px-2"> <!-- Reduced gap-y -->
                     <div class="col-span-6">
                         <div class="bilingual-label"><span class="en">Patient Name</span><span class="ta">நோயாளி பெயர்</span></div>
-                        <input type="text">
+                        <input type="text" id="patientName">
                     </div>
                     <div class="col-span-2">
                         <div class="bilingual-label"><span class="en">Age</span><span class="ta">வயது</span></div>
-                        <input type="number">
+                        <input type="number" id="age">
                     </div>
                     <div class="col-span-2">
                         <div class="bilingual-label"><span class="en">Gender</span><span class="ta">பாலினம்</span></div>
-                        <input type="text" placeholder="M/F">
+                        <input type="text" id="gender" placeholder="M/F">
                     </div>
                     <div class="col-span-2">
                         <div class="bilingual-label"><span class="en">Mobile No.</span><span class="ta">கைபேசி எண்</span></div>
-                        <input type="tel">
+                        <input type="tel" id="patientMobile">
                     </div>
 
                     <div class="col-span-6">
                         <div class="bilingual-label"><span class="en">Patient Aadhaar No.</span><span class="ta">நோயாளி ஆதார் எண்</span></div>
-                        <input type="text" class="tracking-widest">
+                        <input type="text" id="patientAadhaar" class="tracking-widest">
                     </div>
                     <div class="col-span-6">
                         <div class="bilingual-label"><span class="en">Insured Aadhaar No.</span><span class="ta">காப்பீட்டாளர் ஆதார் எண்</span></div>
-                        <input type="text" class="tracking-widest">
+                        <input type="text" id="insuredAadhaar" class="tracking-widest">
                     </div>
                 </div>
             </section>
@@ -243,15 +321,15 @@
                 <div class="grid grid-cols-12 gap-x-5 gap-y-1.5 px-2"> <!-- Reduced gap-y -->
                     <div class="col-span-6">
                         <div class="bilingual-label"><span class="en">Borrower Name (Vadikaiyalar)</span><span class="ta">வாடிக்கையாளர் பெயர்</span></div>
-                        <input type="text">
+                        <input type="text" id="borrowerName">
                     </div>
                     <div class="col-span-6">
                         <div class="bilingual-label"><span class="en">Borrower Mobile No.</span><span class="ta">வாடிக்கையாளர் கைபேசி எண்</span></div>
-                        <input type="tel">
+                        <input type="tel" id="borrowerMobile">
                     </div>
                     <div class="col-span-12">
                         <div class="bilingual-label"><span class="en">Bank Name</span><span class="ta">வங்கி பெயர்</span></div>
-                        <input type="text">
+                        <input type="text" id="bankName">
                     </div>
                 </div>
             </section>
@@ -269,19 +347,19 @@
                     <!-- NACH -->
                     <div class="border-r border-slate-200 pr-6">
                         <label class="flex items-center cursor-pointer mb-2 group">
-                            <input type="checkbox" class="custom-checkbox"> 
+                            <input type="checkbox" id="nachCheckbox" class="custom-checkbox"> 
                             <span class="text-xs font-bold text-slate-800 ml-2 group-hover:text-cyan-700 transition-colors">NACH Mandate</span>
                         </label>
                         <div class="pl-6">
                             <div class="bilingual-label"><span class="en">NACH Max Amount (₹)</span><span class="ta">நாச் தொகை</span></div>
-                            <input type="text" placeholder="₹ 0.00" class="font-mono text-base bg-white/50 px-1 border-slate-300">
+                            <input type="text" id="nachAmount" placeholder="₹ 0.00" class="font-mono text-base bg-white/50 px-1 border-slate-300">
                         </div>
                     </div>
 
                     <!-- Cheque -->
                     <div>
                         <label class="flex items-center cursor-pointer mb-2 group">
-                            <input type="checkbox" class="custom-checkbox"> 
+                            <input type="checkbox" id="chequeCheckbox" class="custom-checkbox"> 
                             <div class="flex flex-col ml-2 leading-none">
                                 <span class="text-xs font-bold text-slate-800 group-hover:text-cyan-700 transition-colors">Security Cheque</span>
                                 <span class="text-[0.55rem] text-slate-500 tamil-text mt-0.5">பாதுகாப்பு காசோலை</span>
@@ -290,11 +368,11 @@
                         <div class="pl-6 grid grid-cols-2 gap-4">
                             <div>
                                 <div class="bilingual-label"><span class="en">Amount (₹)</span><span class="ta">தொகை</span></div>
-                                <input type="text" placeholder="₹ 0.00" class="font-mono text-base bg-white/50 px-1 border-slate-300">
+                                <input type="text" id="chequeAmount" placeholder="₹ 0.00" class="font-mono text-base bg-white/50 px-1 border-slate-300">
                             </div>
                             <div>
                                 <div class="bilingual-label"><span class="en">Cheque No (Last 4)</span><span class="ta">காசோலை எண்</span></div>
-                                <input type="text" placeholder="XXXX" class="font-mono text-center text-base bg-white/50 px-1 border-slate-300" maxlength="4">
+                                <input type="text" id="chequeNumber" placeholder="XXXX" class="font-mono text-center text-base bg-white/50 px-1 border-slate-300" maxlength="4">
                             </div>
                         </div>
                     </div>
@@ -303,12 +381,12 @@
 
             <!-- Legal Declaration -->
             <section class="mt-1">
-                <div class="bg-slate-50 border border-slate-200 rounded-lg p-2.5"> <!-- Reduced padding -->
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-2.5">
                     <div class="flex items-center gap-2 mb-1 border-b border-slate-300 pb-1">
                         <i data-lucide="scale" class="w-4 h-4 text-slate-700"></i>
                         <strong class="text-slate-900 uppercase tracking-wide text-[0.65rem]">Declaration of Liability / உறுதிமொழி</strong>
                     </div>
-                    <ol class="list-decimal pl-4 space-y-1"> <!-- Reduced spacing -->
+                    <ol class="list-decimal pl-4 space-y-1">
                         <!-- Clause 1: Conditional Liability -->
                         <li class="pl-2">
                             <p class="text-[0.6rem] leading-tight text-slate-800 text-justify serif-font">
@@ -371,8 +449,211 @@
 
     </div>
 
+    <div id="toast">Link copied to clipboard!</div>
+
     <script>
         lucide.createIcons();
+
+        // 1. Init Firebase
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        let currentUser = null;
+        let currentDocId = null;
+
+        // Geolocation variables
+        let userLatitude = null;
+        let userLongitude = null;
+
+        // Function to get user's location
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        userLatitude = position.coords.latitude;
+                        userLongitude = position.coords.longitude;
+                        console.log(`Location captured: Lat=${userLatitude}, Lon=${userLongitude}`);
+                    },
+                    (error) => {
+                        console.warn('Geolocation failed:', error.message);
+                        userLatitude = 'Denied/Unavailable';
+                        userLongitude = 'Denied/Unavailable';
+                    }, 
+                    {
+                        enableHighAccuracy: false,
+                        timeout: 5000,
+                        maximumAge: 0
+                    }
+                );
+            } else {
+                console.warn("Geolocation not supported by this browser.");
+                userLatitude = 'Not Supported';
+                userLongitude = 'Not Supported';
+            }
+        }
+
+
+        // 2. Auth & Load
+        async function init() {
+            // Start location tracking immediately
+            getCurrentLocation();
+            
+            try {
+                // Auth check
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await auth.signInWithCustomToken(__initial_auth_token);
+                } else {
+                    await auth.signInAnonymously();
+                }
+
+                auth.onAuthStateChanged(async (user) => {
+                    if (user) {
+                        currentUser = user;
+                        // Check URL params
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const docId = urlParams.get('id');
+                        if (docId) {
+                            currentDocId = docId;
+                            await loadFormData(docId);
+                            // Show ID on load
+                            document.getElementById('documentIdDisplay').value = docId;
+                            document.getElementById('documentIdContainer').style.display = 'flex';
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error("Auth failed:", error);
+            }
+        }
+
+        // 3. Save Data
+        async function saveFormData() {
+            if (!currentUser) return;
+
+            const statusEl = document.getElementById('saveStatus');
+            statusEl.textContent = 'Saving...';
+
+            const data = {};
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                if (input.type === 'checkbox') {
+                    data[input.id] = input.checked;
+                } else {
+                    data[input.id] = input.value;
+                }
+            });
+
+            // Add geolocation data to the log
+            data.log = {
+                location: {
+                    latitude: userLatitude,
+                    longitude: userLongitude,
+                    timestamp: new Date().toISOString()
+                },
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            try {
+                if (currentDocId) {
+                    // Update existing
+                    await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('forms').doc(currentDocId).update(data);
+                } else {
+                    // Create new
+                    const docRef = await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('forms').add(data);
+                    currentDocId = docRef.id;
+                }
+
+                statusEl.textContent = 'Saved!';
+                
+                // Update URL and ID display
+                const newUrl = `${window.location.pathname}?id=${currentDocId}`;
+                window.history.pushState({path: newUrl}, '', newUrl);
+                
+                document.getElementById('documentIdDisplay').value = currentDocId;
+                document.getElementById('documentIdContainer').style.display = 'flex';
+
+
+                // Copy to clipboard
+                const fullUrl = window.location.href;
+                
+                const textArea = document.createElement("textarea");
+                textArea.value = fullUrl;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                   document.execCommand('copy');
+                   showToast("Form Saved! Link copied to clipboard.");
+                } catch (err) {
+                   showToast("Form Saved! Copy the URL to share.");
+                }
+                document.body.removeChild(textArea);
+
+            } catch (error) {
+                console.error("Save error:", error);
+                statusEl.textContent = 'Error Saving';
+                showToast("Error saving form. Check permissions.");
+            }
+        }
+
+        // 4. Load Data
+        async function loadFormData(id) {
+            const statusEl = document.getElementById('saveStatus');
+            statusEl.textContent = 'Loading...';
+            
+            try {
+                const docRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('forms').doc(id);
+                const docSnap = await docRef.get();
+
+                if (docSnap.exists) {
+                    const data = docSnap.data();
+                    const inputs = document.querySelectorAll('input');
+                    
+                    inputs.forEach(input => {
+                        if (data.hasOwnProperty(input.id)) {
+                             if (input.type === 'checkbox') {
+                                input.checked = data[input.id];
+                            } else {
+                                input.value = data[input.id];
+                            }
+                        }
+                    });
+                    statusEl.textContent = 'Loaded';
+                } else {
+                    statusEl.textContent = 'Not Found';
+                    showToast("Form ID not found.");
+                }
+            } catch (error) {
+                console.error("Load error:", error);
+                statusEl.textContent = 'Error Loading';
+            }
+        }
+        
+        // 5. Copy ID function
+        function copyDocumentId() {
+            const idField = document.getElementById('documentIdDisplay');
+            if (idField.value) {
+                idField.select();
+                try {
+                    document.execCommand('copy');
+                    showToast("Document ID copied!");
+                } catch (err) {
+                    showToast("Failed to copy ID.");
+                }
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            toast.textContent = message;
+            toast.className = "show";
+            setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+        }
+
+        // Run
+        init();
     </script>
 </body>
 </html>
